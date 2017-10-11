@@ -4,6 +4,10 @@ process.env.DEBUG = 'actions-on-google:*';
 const App = require('actions-on-google').ApiAiApp;
 const functions = require('firebase-functions');
 
+var Client = require('node-rest-client').Client;
+
+var client = new Client();
+
 // a. the action name from the make_name API.AI intent
 const NAME_ACTION = 'get_content';
 // b. the parameters that are parsed from the make_name intent 
@@ -20,8 +24,16 @@ exports.content_bot = functions.https.onRequest((request, response) => {
 // c. The function that generates the silly name
   function get_content (app) {
     let content = app.getArgument(CONTENT);
-    
-    app.tell('Alright,' + contentMap[content]);
+
+    // direct way 
+    client.get("https://frank-ecs-production.up.welt.de/content/102206492.json", function (data, response) {
+      // parsed response body as js object 
+      console.log(data);
+      // raw response 
+      console.log(response);
+
+      app.tell('Alright,' + JSON.stringify(data).substring(1,4));
+    });
     
   }
   // d. build an action map, which maps intent names to functions
